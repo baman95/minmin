@@ -11,8 +11,10 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
@@ -20,34 +22,34 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun GenderDropdown() {
     val genderOptions = listOf("Male", "Female", "Other")
-    val (selectedGender, setSelectedGender) = remember { mutableStateOf(genderOptions[0]) }
-    val (expanded, setExpanded) = remember { mutableStateOf(false) }
+    var selectedGender by remember { mutableStateOf(genderOptions[0]) }
+    var expanded by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
         ExposedDropdownMenuBox(
             expanded = expanded,
-            onExpandedChange = { setExpanded(!expanded) }
+            onExpandedChange = { expanded = !expanded }
         ) {
             TextField(
                 value = selectedGender,
                 onValueChange = {},
                 label = { Text("Gender") },
                 readOnly = true,
-                modifier = Modifier.fillMaxWidth().clickable { setExpanded(true) },
+                modifier = Modifier.fillMaxWidth().clickable { expanded = true },
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                 }
             )
             ExposedDropdownMenu(
                 expanded = expanded,
-                onDismissRequest = { setExpanded(false) }
+                onDismissRequest = { expanded = false }
             ) {
                 genderOptions.forEach { gender ->
                     DropdownMenuItem(
                         text = { Text(text = gender) },
                         onClick = {
-                            setSelectedGender(gender)
-                            setExpanded(false)
+                            selectedGender = gender
+                            expanded = false
                         }
                     )
                 }

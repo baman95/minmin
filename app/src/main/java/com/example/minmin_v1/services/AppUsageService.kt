@@ -1,39 +1,35 @@
-package com.example.minmin_v1.data
+package com.example.minmin_v1.services
 
-import android.app.usage.UsageStats
+import android.app.Service
 import android.app.usage.UsageStatsManager
 import android.content.Context
-import android.content.pm.PackageManager
-import com.example.minmin_v1.model.AppUsageInfo
+import android.content.Intent
+import android.os.IBinder
+import android.util.Log
 
-object AppUsageService {
+class AppUsageService : Service() {
+    override fun onBind(intent: Intent?): IBinder? {
+        return null
+    }
 
-    fun getUsageStats(context: Context): List<AppUsageInfo> {
-        val usageStatsManager = context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
-        val endTime = System.currentTimeMillis()
-        val startTime = endTime - 24 * 60 * 60 * 1000 // Last 24 hours
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        monitorAppUsage()
+        return START_STICKY
+    }
 
-        val usageStats: List<UsageStats> = usageStatsManager.queryUsageStats(
-            UsageStatsManager.INTERVAL_DAILY, startTime, endTime
-        )
-
-        val appUsageInfoList = mutableListOf<AppUsageInfo>()
-        val packageManager = context.packageManager
-
-        usageStats.forEach { usageStat ->
-            try {
-                val appName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(usageStat.packageName, PackageManager.GET_META_DATA)).toString()
-                appUsageInfoList.add(
-                    AppUsageInfo(
-                        appName = appName,
-                        usageTime = usageStat.totalTimeInForeground
-                    )
-                )
-            } catch (e: PackageManager.NameNotFoundException) {
-                e.printStackTrace()
-            }
+    private fun monitorAppUsage() {
+        val usageStatsManager = getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
+        val currentTime = System.currentTimeMillis()
+        val usageEvents = usageStatsManager.queryEvents(currentTime - 1000 * 60 * 60, currentTime)
+        while (usageEvents.hasNextEvent()) {
+            val event = android.app.usage.UsageEvents.Event()
+            usageEvents.getNextEvent(event)
+            Log.d("AppUsageService", "Event: ${event.packageName}, Type: ${event.eventType}")
         }
+    }
 
-        return appUsageInfoList
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("AppUsageService", "App Usage Service Destroyed")
     }
 }
