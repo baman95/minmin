@@ -1,6 +1,11 @@
 package com.example.minmin_v1.screens
 
+import android.Manifest
+import android.app.AppOpsManager
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.provider.Settings
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -38,6 +43,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.minmin_v1.R
@@ -80,7 +86,7 @@ fun HomeScreen(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 TileButton(icon = painterResource(id = R.drawable.ic_app_usage), label = "App Usage Monitoring", onClick = {
-                    context.startService(Intent(context, AppUsageService::class.java))
+                    requestPermissionsAndStartService(context)
                 })
                 Spacer(modifier = Modifier.height(16.dp))
                 TileButton(icon = painterResource(id = R.drawable.ic_grayscale), label = "Grayscale Mode", onClick = {
@@ -154,4 +160,32 @@ fun TileButton(icon: Painter, label: String, onClick: () -> Unit) {
             Text(label, color = Color.White, style = MaterialTheme.typography.titleLarge)
         }
     }
+}
+
+fun requestPermissionsAndStartService(context: Context) {
+    val requiredPermissions = listOf(
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.READ_EXTERNAL_STORAGE
+    )
+
+    val allPermissionsGranted = requiredPermissions.all { permission ->
+        ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+    } && checkUsageAccessPermission(context)
+
+    if (allPermissionsGranted) {
+        context.startService(Intent(context, AppUsageService::class.java))
+    } else {
+        requestPermissions(context)
+    }
+}
+
+fun requestPermissions(context: Context) {
+    val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
+    context.startActivity(intent)
+}
+
+fun checkUsageAccessPermission(context: Context): Boolean {
+    val appOpsManager = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
+    val mode = appOpsManager.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, android.os.Process.myUid(), context.packageName)
+    return mode == AppOpsManager.MODE_ALLOWED
 }
