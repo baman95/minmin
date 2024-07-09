@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primaryColor">#03A9F4</color>
+    <color name="primaryVariantColor">#2196F3</color>
+    <color name="secondaryColor">#FFEB3B</color>
+    <color name="secondaryVariantColor">#FFC107</color>
+    <color name="backgroundColor">#FFFFFF</color>
+    <color name="surfaceColor">#FFFFFF</color>
+    <color name="errorColor">#B00020</color>
+    <color name="onPrimaryColor">#FFFFFF</color>
+    <color name="onSecondaryColor">#000000</color>
+    <color name="onBackgroundColor">#000000</color>
+    <color name="onSurfaceColor">#000000</color>
+    <color name="onErrorColor">#FFFFFF</color>
+    <color name="red">#E91E63</color>
+    <color name="green">#4CAF50</color>
+    <color name="blue">#2196F3</color>
+    <color name="yellow">#FFEB3B</color>
+    <color name="white">#FFFFFF</color>
+</resources>
+
