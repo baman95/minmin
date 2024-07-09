@@ -1,14 +1,12 @@
 package com.example.minmin_v1.components
 
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
@@ -28,33 +26,29 @@ import coil.compose.rememberAsyncImagePainter
 @Composable
 fun ProfileImagePicker() {
     val context = LocalContext.current
-    var imageUri by remember { mutableStateOf<String?>(null) }
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) { uri ->
-        uri?.let {
-            imageUri = it.toString()
-        }
+    ) { uri: Uri? ->
+        imageUri = uri
     }
 
-    Box(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            imageUri?.let {
-                Image(
-                    painter = rememberAsyncImagePainter(it),
-                    contentDescription = null,
-                    modifier = Modifier.size(100.dp).clip(CircleShape)
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = {
-                launcher.launch("image/*")
-            }) {
-                Text("Pick Profile Image")
-            }
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        imageUri?.let {
+            Image(
+                painter = rememberAsyncImagePainter(it),
+                contentDescription = null,
+                modifier = Modifier.size(100.dp).clip(CircleShape)
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = {
+            launcher.launch("image/*")
+        }) {
+            Text("Pick Profile Image")
         }
     }
 }

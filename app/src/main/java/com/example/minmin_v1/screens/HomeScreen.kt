@@ -1,5 +1,6 @@
 package com.example.minmin_v1.screens
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,11 +35,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.minmin_v1.R
+import com.example.minmin_v1.services.AppUsageService
+import com.example.minmin_v1.services.NotificationListener
+import com.example.minmin_v1.setGrayscaleMode
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
@@ -47,6 +52,7 @@ import kotlinx.coroutines.launch
 fun HomeScreen(navController: NavController) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -73,13 +79,17 @@ fun HomeScreen(navController: NavController) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                TileButton(icon = painterResource(id = R.drawable.ic_app_usage), label = "App Usage Monitoring", onClick = { /* Handle click */ })
+                TileButton(icon = painterResource(id = R.drawable.ic_app_usage), label = "App Usage Monitoring", onClick = {
+                    context.startService(Intent(context, AppUsageService::class.java))
+                })
                 Spacer(modifier = Modifier.height(16.dp))
-                TileButton(icon = painterResource(id = R.drawable.ic_grayscale), label = "Grayscale Mode", onClick = { /* Handle click */ })
+                TileButton(icon = painterResource(id = R.drawable.ic_grayscale), label = "Grayscale Mode", onClick = {
+                    setGrayscaleMode(context, true)
+                })
                 Spacer(modifier = Modifier.height(16.dp))
-                TileButton(icon = painterResource(id = R.drawable.ic_delay), label = "Delay App Loading", onClick = { /* Handle click */ })
-                Spacer(modifier = Modifier.height(16.dp))
-                TileButton(icon = painterResource(id = R.drawable.ic_notifications), label = "Block Notifications", onClick = { /* Handle click */ })
+                TileButton(icon = painterResource(id = R.drawable.ic_notifications), label = "Block Notifications", onClick = {
+                    NotificationListener.blockNotifications(context)
+                })
             }
         }
     }
@@ -87,15 +97,15 @@ fun HomeScreen(navController: NavController) {
 
 @Composable
 fun DrawerContent(navController: NavController) {
+    val user = FirebaseAuth.getInstance().currentUser
+    val displayName = user?.displayName ?: "User"
+    val photoUrl = user?.photoUrl
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
-        val user = FirebaseAuth.getInstance().currentUser
-        val displayName = user?.displayName ?: "User"
-        val photoUrl = user?.photoUrl
-
         Row(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalAlignment = Alignment.CenterVertically

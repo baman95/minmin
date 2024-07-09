@@ -11,8 +11,10 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
@@ -20,34 +22,34 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ClassDropdown() {
     val classOptions = listOf("Class 1", "Class 2", "Class 3", "Class 4", "Class 5")
-    val (selectedClass, setSelectedClass) = remember { mutableStateOf(classOptions[0]) }
-    val (expanded, setExpanded) = remember { mutableStateOf(false) }
+    var selectedClass by remember { mutableStateOf(classOptions[0]) }
+    var expanded by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
         ExposedDropdownMenuBox(
             expanded = expanded,
-            onExpandedChange = { setExpanded(!expanded) }
+            onExpandedChange = { expanded = !expanded }
         ) {
             TextField(
                 value = selectedClass,
                 onValueChange = {},
                 label = { Text("Class") },
                 readOnly = true,
-                modifier = Modifier.fillMaxWidth().clickable { setExpanded(true) },
+                modifier = Modifier.fillMaxWidth().clickable { expanded = true },
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
                 }
             )
             ExposedDropdownMenu(
                 expanded = expanded,
-                onDismissRequest = { setExpanded(false) }
+                onDismissRequest = { expanded = false }
             ) {
                 classOptions.forEach { classOption ->
                     DropdownMenuItem(
                         text = { Text(text = classOption) },
                         onClick = {
-                            setSelectedClass(classOption)
-                            setExpanded(false)
+                            selectedClass = classOption
+                            expanded = false
                         }
                     )
                 }
